@@ -5,7 +5,6 @@ from pydantic import BaseModel, ConfigDict
 
 load_dotenv()
 
-
 class JobItem(BaseModel):
     model_config = ConfigDict(extra="forbid")
     component: str

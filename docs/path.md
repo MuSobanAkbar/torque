@@ -10,3 +10,10 @@ so, what i have chosen, is that I wnat the AI to handle the language, while pyth
 
 If it does end up halluicinating somewhere, we would know because we run a deterministic python check that 
 extracts every dollar amount from the llms explanation text and verifies it against the quote's real numbers.
+
+
+
+
+
+# extract.py 
+So we need pydantic to generate a strict json blueprint. and then hand that to groq, with strict:true.
