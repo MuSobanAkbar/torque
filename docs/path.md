@@ -17,3 +17,6 @@ extracts every dollar amount from the llms explanation text and verifies it agai
 
 # extract.py 
 So we need pydantic to generate a strict json blueprint. and then hand that to groq, with strict:true.
+
+what groq does after that is that it uses constrained decoding to gurantee that its response follows its blueprint, and 
+pydantic makes those json string into python objects
