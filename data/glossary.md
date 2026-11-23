@@ -1,0 +1,5 @@
+- RR = Right Rear, LR = Left Rear, RF = Right Front, LF = Left Front
+- pads = brake pads, rotor scored = brake rotor grooved/damaged
+- rec = recommend
+- CV boot = constant velocity axle boot
+- "2k over" = 2,000 km overdue for scheduled maintenance
