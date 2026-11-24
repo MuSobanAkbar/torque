@@ -1,0 +1,24 @@
+price_key,description,parts_cost,labour_hours,safety
+brake_pads_rear,Rear Brake Pads Replacement,65.00,1.0,true
+brake_pads_front,Front Brake Pads Replacement,75.00,1.0,true
+brake_rotor_rear,Rear Brake Rotor Replacement,90.00,0.8,true
+brake_rotor_front,Front Brake Rotor Replacement,105.00,0.8,true
+brake_fluid_flush,Brake Fluid Flush,30.00,0.5,true
+cv_boot_front,Front CV Axle Boot Replacement,45.00,1.5,false
+cv_axle_front,Front CV Axle Assembly Replacement,140.00,1.8,false
+tire_replace,Single Tire Mount and Balance,135.00,0.4,true
+tire_rotation,Four-Wheel Tire Rotation,0.00,0.4,true
+wheel_alignment,Four-Wheel Alignment,0.00,1.0,true
+tie_rod_end,Outer Tie Rod End Replacement,55.00,1.0,true
+ball_joint_front,Front Lower Ball Joint Replacement,70.00,1.5,true
+strut_assembly_front,Front Strut Assembly Replacement,160.00,1.5,true
+shock_absorber_rear,Rear Shock Absorber Replacement,95.00,1.0,true
+oil_change_synthetic,Full Synthetic Oil and Filter Change,45.00,0.5,false
+air_filter_engine,Engine Air Filter Replacement,25.00,0.2,false
+cabin_air_filter,Cabin Air Filter Replacement,28.00,0.2,false
+battery_replace,12V Automotive Battery Replacement,155.00,0.3,false
+alternator_replace,Alternator Replacement,240.00,1.5,false
+spark_plugs_set,Spark Plugs Replacement (4-Cyl),60.00,1.0,false
+serpentine_belt,Serpentine Drive Belt Replacement,35.00,0.6,false
+coolant_flush,Engine Coolant System Flush,40.00,0.8,false
+wiper_blades_pair,Front Wiper Blades Pair,32.00,0.1,false
