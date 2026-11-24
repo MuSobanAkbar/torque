@@ -20,3 +20,9 @@ So we need pydantic to generate a strict json blueprint. and then hand that to g
 
 what groq does after that is that it uses constrained decoding to gurantee that its response follows its blueprint, and 
 pydantic makes those json string into python objects
+
+
+
+# quote.py 
+This is the calculator part essesntially, the way it works is that you have the fixed labour hour cost, and you calculate the total 
+multiplied by the hours using quote.py
