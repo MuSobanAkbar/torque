@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 from pydantic import BaseModel, ConfigDict
-
+import csv
 load_dotenv()
 
 class JobItem(BaseModel):
@@ -17,6 +17,11 @@ class JobItem(BaseModel):
 class ExtractionResult(BaseModel):
     model_config = ConfigDict(extra="forbid")
     items: list[JobItem]
+
+
+def load_valid_price_keys() -> list[str]:
+    with open("data/price_list.csv", encoding="utf-8") as f:
+        return [row["price_key"] for row in csv.DictReader(f)]
 
 
 def extract_jobs(notes: str) -> ExtractionResult:
