@@ -26,3 +26,12 @@ pydantic makes those json string into python objects
 # quote.py 
 This is the calculator part essesntially, the way it works is that you have the fixed labour hour cost, and you calculate the total 
 multiplied by the hours using quote.py
+
+
+Also added a safety enforcing rule, where it checks if urgency requires (safety keywords are triggered/row safety is true)
+
+
+
+# explain.py
+the llm gives the user, so instead of the json, we get a clean response that is plain-english and CUSTOMER BASED ONLY
+
