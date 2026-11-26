@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>torque — Service Writer Repair Order Bench</title>
+  <meta name="description" content="Convert mechanic bay shorthand into catalog-locked repair quotes and verified customer summaries for a 3-bay auto shop." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='3' fill='%23181715'/%3E%3Cpath d='M8 10h16v3.5h-6V23h-4v-9.5H8V10z' fill='%23D9381E'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-paper: #F4F1EA;
+      --bg-surface: #FAF8F3;
+      --bg-inset: #ECE8DF;
+      --ink-primary: #181715;
+      --ink-muted: #5C5852;
+      --ink-inverse: #FAF8F3;
+      --rule-hairline: #D4CFC4;
+      --rule-strong: #181715;
+      --accent-safety: #D9381E;
+      --accent-safety-tint: #FCEAE6;
+      --tag-soon-bg: #F5E6C8;
+      --tag-soon-ink: #6B4400;
+      --tag-wait-bg: #E4ECE9;
+      --tag-wait-ink: #1B4D3E;
+
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body: 'IBM Plex Sans', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+
+      --text-xs: 0.75rem;
+      --text-base: 1rem;
+      --text-md: 1.333rem;
+      --text-lg: 1.777rem;
+      --text-display: 3.157rem;
+
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 1rem;
+      --space-4: 1.5rem;
+      --space-5: 2.5rem;
+      --space-6: 4rem;
+
+      --radius-none: 0px;
+      --radius-sm: 3px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-paper);
+      color: var(--ink-primary);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3) var(--space-5);
+      border-bottom: 1px solid var(--rule-strong);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .topbar-mark {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-weight: 600;
+    }
+
+    .topbar-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-safety);
+      display: inline-block;
+    }
+
+    .topbar-meta {
+      color: var(--ink-muted);
+    }
+
+    .masthead {
+      padding: var(--space-5) var(--space-5) var(--space-4);
+      border-bottom: 1px solid var(--rule-hairline);
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      gap: var(--space-5);
+      align-items: end;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-size: var(--text-display);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+    }
+
+    .masthead-scope {
+      margin: 0;
+      color: var(--ink-muted);
+      font-size: var(--text-base);
+      line-height: 1.55;
+      border-left: 2px solid var(--accent-safety);
+      padding-left: var(--space-3);
+    }
+
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(320px, 42%) minmax(0, 58%);
+      min-height: calc(100vh - 230px);
+    }
+
+    .pane-intake {
+      padding: var(--space-5);
+      border-right: 1px solid var(--rule-strong);
+      background-color: var(--bg-paper);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .pane-output {
+      padding: var(--space-5);
+      background-color: var(--bg-surface);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+
+    .section-tag {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      margin-bottom: var(--space-2);
+    }
+
+    label[for="notes"] {
+      font-weight: 700;
+      font-size: var(--text-md);
+      line-height: 1.25;
+      display: block;
+      margin-bottom: var(--space-2);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 170px;
+      padding: var(--space-3);
+      font-family: var(--font-mono);
+      font-size: var(--text-base);
+      line-height: 1.6;
+      color: var(--ink-primary);
+      background-color: var(--bg-surface);
+      border: 1px solid var(--rule-strong);
+      border-radius: var(--radius-sm);
+      resize: vertical;
+    }
+
+    textarea:focus {
+      outline: 2px solid var(--accent-safety);
+      outline-offset: 2px;
+    }
+
+    .sample-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-xs);
+      color: var(--ink-muted);
+    }
+
+    .sample-btn {
+      background: transparent;
+      border: 1px solid var(--rule-hairline);
+      border-radius: var(--radius-sm);
+      padding: var(--space-1) var(--space-2);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--ink-primary);
+      cursor: pointer;
+    }
+
+    .sample-btn:hover {
+      border-color: var(--rule-strong);
+      background-color: var(--bg-inset);
+    }
+
+    .sample-btn:focus-visible,
+    .primary-btn:focus-visible,
+    .copy-btn:focus-visible {
+      outline: 2px solid var(--accent-safety);
+      outline-offset: 2px;
+    }
+
+    .primary-btn {
+      width: 100%;
+      min-height: 48px;
+      padding: var(--space-3) var(--space-4);
+      background-color: var(--ink-primary);
+      color: var(--ink-inverse);
+      border: 1px solid var(--ink-primary);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: var(--text-base);
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 140ms ease, border-color 140ms ease;
+    }
+
+    .primary-btn:hover:not(:disabled) {
+      background-color: var(--accent-safety);
+      border-color: var(--accent-safety);
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+
+    .primary-btn-key {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 400;
+      opacity: 0.85;
+    }
+
+    .rules-list {
+      margin: 0;
+      padding: var(--space-3) 0 0;
+      border-top: 1px solid var(--rule-hairline);
+      list-style: none;
+      display: grid;
+      gap: var(--space-2);
+      font-size: var(--text-xs);
+      color: var(--ink-muted);
+    }
+
+    .rules-list li {
+      padding-left: var(--space-3);
+      position: relative;
+    }
+
+    .rules-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.55em;
+      width: 6px;
+      height: 1px;
+      background-color: var(--ink-primary);
+    }
+
+    .error-banner {
+      padding: var(--space-3);
+      background-color: var(--accent-safety-tint);
+      border-left: 3px solid var(--accent-safety);
+      color: var(--accent-safety);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+    }
+
+    .empty-state {
+      border: 1px dashed var(--rule-hairline);
+      padding: var(--space-5);
+      color: var(--ink-muted);
+    }
+
+    .empty-state h2 {
+      margin: 0 0 var(--space-2);
+      font-size: var(--text-md);
+      font-weight: 600;
+      color: var(--ink-primary);
+    }
+
+    .empty-state p {
+      margin: 0;
+      max-width: 52ch;
+    }
+
+    .ledger-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 2px solid var(--rule-strong);
+      padding-bottom: var(--space-2);
+    }
+
+    .ledger-header h2,
+    .customer-header h2 {
+      margin: 0;
+      font-size: var(--text-lg);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: var(--radius-none);
+    }
+
+    th {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      text-align: left;
+      padding: var(--space-2) var(--space-2);
+      border-bottom: 1px solid var(--rule-strong);
+    }
+
+    td {
+      padding: var(--space-3) var(--space-2);
+      border-bottom: 1px solid var(--rule-hairline);
+      vertical-align: top;
+    }
+
+    .num {
+      text-align: right;
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .service-name {
+      font-weight: 600;
+      display: block;
+    }
+
+    .service-pos {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--ink-muted);
+    }
+
+    .urgency-stamp {
+      display: inline-block;
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .safety_now {
+      background-color: var(--accent-safety-tint);
+      color: var(--accent-safety);
+      border: 1px solid var(--accent-safety);
+    }
+
+    .soon {
+      background-color: var(--tag-soon-bg);
+      color: var(--tag-soon-ink);
+    }
+
+    .can_wait {
+      background-color: var(--tag-wait-bg);
+      color: var(--tag-wait-ink);
+    }
+
+    .manual-flag {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--tag-soon-ink);
+      background-color: var(--tag-soon-bg);
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-sm);
+      display: inline-block;
+    }
+
+    .total-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: var(--space-3) var(--space-2);
+      border-bottom: 2px solid var(--rule-strong);
+      background-color: var(--bg-paper);
+    }
+
+    .total-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+    }
+
+    .total-value {
+      font-family: var(--font-mono);
+      font-size: var(--text-lg);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .customer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-3);
+      gap: var(--space-2);
+    }
+
+    .verify-tag {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--ink-muted);
+    }
+
+    .copy-btn {
+      background-color: var(--bg-paper);
+      border: 1px solid var(--rule-strong);
+      border-radius: var(--radius-sm);
+      padding: var(--space-1) var(--space-3);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      background-color: var(--ink-primary);
+      color: var(--ink-inverse);
+    }
+
+    .customer-copy {
+      margin: 0;
+      padding: var(--space-4);
+      background-color: var(--bg-paper);
+      border-left: 3px solid var(--rule-strong);
+      white-space: pre-wrap;
+      line-height: 1.65;
+    }
+
+    .footer {
+      padding: var(--space-3) var(--space-5);
+      border-top: 1px solid var(--rule-hairline);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--ink-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @keyframes revealUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal-1 { animation: revealUp 320ms ease-out both; }
+    .reveal-2 { animation: revealUp 320ms ease-out 70ms both; }
+    .reveal-3 { animation: revealUp 320ms ease-out 140ms both; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal-1, .reveal-2, .reveal-3 {
+        animation: none;
+      }
+      .primary-btn {
+        transition: none;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .masthead {
+        grid-template-columns: 1fr;
+        gap: var(--space-3);
+        padding: var(--space-4) var(--space-3);
+      }
+      .workbench {
+        grid-template-columns: 1fr;
+      }
+      .pane-intake {
+        border-right: none;
+        border-bottom: 1px solid var(--rule-strong);
+        padding: var(--space-4) var(--space-3);
+      }
+      .pane-output {
+        padding: var(--space-4) var(--space-3);
+      }
+      .topbar, .footer {
+        padding: var(--space-3);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar reveal-1">
+    <div class="topbar-mark">
+      <span class="topbar-dot" aria-hidden="true"></span>
+      <span>TORQUE // BAY ESTIMATING BENCH</span>
+    </div>
+    <div class="topbar-meta">CATALOG: 23 ITEMS · LABOR: $120.00/HR</div>
+  </header>
+
+  <section class="masthead reveal-2">
+    <h1>Turn bay shorthand into a locked customer quote.</h1>
+    <p class="masthead-scope">
+      Built for service writers at a 3-bay repair shop. Every dollar figure comes from the shop CSV catalog, and every safety repair is locked to immediate attention in code.
+    </p>
+  </section>
+
+  <main class="workbench reveal-3">
+    <section class="pane-intake" aria-label="Mechanic note intake">
+      <div>
+        <div class="section-tag">
+          <span>01 / Bay Intake</span>
+          <span>Max 2,000 chars</span>
+        </div>
+        <label for="notes">Mechanic inspection notes</label>
+        <textarea id="notes" placeholder="RR pads 2mm, rotor scored, rec replace both rear. CV boot torn LF. Oil 2k over."></textarea>
+      </div>
+
+      <div class="sample-row">
+        <span>Load bay note:</span>
+        <button type="button" class="sample-btn" onclick="loadSample('RR pads 2mm, rotor scored, rec replace both rear. CV boot torn LF. Oil 2k over.')">Brakes + CV + Oil</button>
+        <button type="button" class="sample-btn" onclick="loadSample('RR pads 2mm, Oil 2k over, Hybrid inverter coolant pump leaking')">Unlisted Hybrid Part</button>
+      </div>
+
+      <button type="button" id="submitBtn" class="primary-btn" onclick="generateQuote()">
+        <span id="submitLabel">Price Repair Order</span>
+        <span class="primary-btn-key">Ctrl + Enter</span>
+      </button>
+
+      <div id="error" class="error-banner hidden" role="alert"></div>
+
+      <ul class="rules-list">
+        <li>For service writers pricing bay inspections; not a self-service customer portal.</li>
+        <li>Brakes, steering, tires, and suspension always lock to SAFETY_NOW.</li>
+        <li>Unlisted parts flag for manual pricing instead of estimating a number.</li>
+      </ul>
+    </section>
+
+    <section class="pane-output" aria-label="Repair order ledger and customer summary">
+      <div id="emptyState" class="empty-state">
+        <div class="section-tag"><span>02 / Repair Order Ledger</span><span>Awaiting notes</span></div>
+        <h2>No inspection priced yet</h2>
+        <p>Paste a technician's bay notes on the left and select <strong>Price Repair Order</strong> to generate the itemized ledger and phone-ready customer summary.</p>
+      </div>
+
+      <div id="results" class="hidden">
+        <div>
+          <div class="section-tag"><span>02 / Repair Order Ledger</span><span>Deterministic CSV Math</span></div>
+          <div class="ledger-header">
+            <h2>Itemized Estimate</h2>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Service &amp; Position</th>
+                  <th scope="col">Urgency</th>
+                  <th scope="col" class="num">Parts</th>
+                  <th scope="col" class="num">Labor</th>
+                  <th scope="col" class="num">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody id="linesBody"></tbody>
+            </table>
+          </div>
+
+          <div class="total-strip">
+            <span class="total-label">Catalog-Priced Total</span>
+            <span class="total-value" id="totalBox">$0.00</span>
+          </div>
+        </div>
+
+        <div style="margin-top: var(--space-5);">
+          <div class="section-tag">
+            <span>03 / Customer Readout</span>
+            <span class="verify-tag" id="fallbackBadge"></span>
+          </div>
+          <div class="customer-header">
+            <h2>Plain-English Summary</h2>
+            <button type="button" id="copyBtn" class="copy-btn" onclick="copySummary()">Copy Summary</button>
+          </div>
+          <p class="customer-copy" id="explanationBox"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>torque — Deterministic Quote Pipeline</span>
+    <span>© 2026 torque</span>
+  </footer>
+
+  <script>
+    function loadSample(text) {
+      const box = document.getElementById("notes");
+      box.value = text;
+      box.focus();
+    }
+
+    document.getElementById("notes").addEventListener("keydown", function (event) {
+      if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+        generateQuote();
+      }
+    });
+
+    async function copySummary() {
+      const text = document.getElementById("explanationBox").textContent;
+      const btn = document.getElementById("copyBtn");
+      if (!text) return;
+      await navigator.clipboard.writeText(text);
+      btn.textContent = "Copied";
+      setTimeout(() => { btn.textContent = "Copy Summary"; }, 1600);
+    }
+
+    async function generateQuote() {
+      const notes = document.getElementById("notes").value.trim();
+      const btn = document.getElementById("submitBtn");
+      const label = document.getElementById("submitLabel");
+      const err = document.getElementById("error");
+      if (!notes) return;
+
+      btn.disabled = true;
+      label.textContent = "Pricing Repair Order...";
+      err.classList.add("hidden");
+      err.textContent = "";
+
+      try {
+        const res = await fetch("/quote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ notes })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Request failed");
+
+        const tbody = document.getElementById("linesBody");
+        tbody.innerHTML = "";
+        for (const line of data.quote.lines) {
+          const isManual = line.status === "needs manual quote";
+          const priceCells = isManual
+            ? `<td colspan="3" class="num"><span class="manual-flag">NEEDS MANUAL QUOTE</span></td>`
+            : `<td class="num">$${line.parts_cost.toFixed(2)}</td>
+               <td class="num">$${line.labour_cost.toFixed(2)}</td>
+               <td class="num"><strong>$${line.subtotal.toFixed(2)}</strong></td>`;
+
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>
+              <span class="service-name"></span>
+              <span class="service-pos"></span>
+            </td>
+            <td><span class="urgency-stamp ${line.urgency}">${line.urgency.replace("_", " ")}</span></td>
+            ${priceCells}
+          `;
+          row.querySelector(".service-name").textContent = line.description;
+          row.querySelector(".service-pos").textContent = line.position;
+          tbody.appendChild(row);
+        }
+
+        document.getElementById("totalBox").textContent = `$${data.quote.total.toFixed(2)}`;
+        document.getElementById("explanationBox").textContent = data.explanation;
+        document.getElementById("fallbackBadge").textContent = data.used_fallback
+          ? "FALLBACK TEMPLATE · 100% DETERMINISTIC"
+          : "REGEX VERIFIED · ALL $ MATCH LEDGER";
+
+        document.getElementById("emptyState").classList.add("hidden");
+        document.getElementById("results").classList.remove("hidden");
+      } catch (e) {
+        err.textContent = e.message;
+        err.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        label.textContent = "Price Repair Order";
+      }
+    }
+  </script>
+</body>
+</html>
