@@ -1,8 +1,10 @@
+import csv
 import os
+
 from dotenv import load_dotenv
 from groq import Groq
 from pydantic import BaseModel, ConfigDict
-import csv
+
 load_dotenv()
 
 class JobItem(BaseModel):

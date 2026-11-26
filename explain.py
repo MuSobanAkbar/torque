@@ -1,8 +1,10 @@
 import json
 import os
 import re
+
 from dotenv import load_dotenv
 from groq import Groq
+
 from extract import extract_jobs
 from quote import build_quote
 

@@ -1,5 +1,6 @@
 import csv
 import json
+
 from extract import JobItem, extract_jobs
 
 LABOUR_RATE = 120.0  # Shop rate: $120/hour

@@ -54,7 +54,7 @@ def test_verify_explanation_prices_blocks_hallucinated_discount():
         ],
     }
     good_text = "Your rear brake pads ($185.00 total: $65.00 parts, $120.00 labor) are safety_now."
-    bad_text = "Good news! With a special discount, your rear brake pads are only $99.00."
+    bad_text = "Good news! With a special discount, your rear brake pads are only $99.00." # This is a hallucinated price, not in the quote.
 
     assert verify_explanation_prices(good_text, quote) is True
     assert verify_explanation_prices(bad_text, quote) is False

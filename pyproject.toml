@@ -13,7 +13,9 @@ dependencies = [
     "python-dotenv>=1.2.4",
     "uvicorn>=0.54.0",
 ]
-
+# ADDED: tell pytest to include the project root on sys.path so tests can import explain.py, quote.py, etc.
+[tool.pytest.ini_options]
+pythonpath = ["."]
 [project.scripts]
 torque = "torque:main"
 
