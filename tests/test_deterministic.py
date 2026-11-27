@@ -3,7 +3,7 @@ from extract import JobItem
 from quote import build_quote
 
 
-def test_catalog_lookup_and_math():
+def test_catalog_lookup_and_math(): # test that the catalog lookup and math are correct
     items = [
         JobItem(
             component="brake pads",
