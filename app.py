@@ -35,3 +35,7 @@ def create_quote(payload: QuoteRequest) -> dict:
         "explanation": explanation,
         "used_fallback": used_fallback,
     }
+
+@app.get("/health")
+def health_check() -> dict[str, str]: #first str is status, second str is message, basically a health check endpoint for the API
+    return {"status": "ok"}
