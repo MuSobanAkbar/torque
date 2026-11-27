@@ -1,4 +1,5 @@
 import json
+
 from explain import generate_explanation, verify_explanation_prices
 from extract import extract_jobs
 from quote import build_quote, load_price_list
